@@ -11,38 +11,37 @@ function ImageFactory(imageView, cropView) {
     if(arguments.length !== 2) {
         throw 'Please pass "imageView" and "cropView" reference as Parameters in ImageFactory';
     }
-    self = this;
-    self.imageView = imageView;
-    self.cropView = cropView;
+    this.imageView = imageView;
+    this.cropView = cropView;
 
-    self.isPinch = false;
-    self.isZoom = false;
+    this.isPinch = false;
+    this.isZoom = false;
 
-    self.defaultWidth = self.imageView.width - self.cropView.width;
-    self.defaultHeight = self.imageView.height - self.cropView.height;
+    this.defaultWidth = this.imageView.width - this.cropView.width;
+    this.defaultHeight = this.imageView.height - this.cropView.height;
 
-    self.imgMaxWidth = self.imageView.width;
-    self.imgMaxHeight = self.imageView.height;
-    self.imgMinWidth = self.imageView.width;
-    self.imgMinHeight = self.imageView.height;
+    this.imgMaxWidth = this.imageView.width;
+    this.imgMaxHeight = this.imageView.height;
+    this.imgMinWidth = this.imageView.width;
+    this.imgMinHeight = this.imageView.height;
 }
 
 //===== Setter =====//
 
 ImageFactory.prototype.setImgMaxWidth = function(number) {
-    self.imgMaxWidth = number;
+    this.imgMaxWidth = number;
 }
 
 ImageFactory.prototype.setImgMaxHeight = function(number) {
-    self.imgMaxHeight = number;
+    this.imgMaxHeight = number;
 }
 
 ImageFactory.prototype.setImgMinWidth = function(number) {
-    self.imgMinWidth = number;
+    this.imgMinWidth = number;
 }
 
 ImageFactory.prototype.setImgMinHeight = function(number) {
-    self.imgMinHeight = number;
+    this.imgMinHeight = number;
 }
 
 //===== Public Methods =====//
@@ -51,11 +50,11 @@ ImageFactory.prototype.setImage = function(imgPath) {
     if(arguments.length != 1) {
         throw 'Please pass an "img path" as Parameters in ImageFactory::setImage';
     }
-    self.imageView.image = imgPath;
-    self.imgMaxWidth = self.imageView.width;
-    self.imgMaxHeight = self.imageView.height;
-    self.imageView.left = 0;
-    self.imageView.top = 0;
+    this.imageView.image = imgPath;
+    this.imgMaxWidth = this.imageView.width;
+    this.imgMaxHeight = this.imageView.height;
+    this.imageView.left = 0;
+    this.imageView.top = 0;
 };
 
 // Bind a click event to crop the image
@@ -63,25 +62,26 @@ ImageFactory.prototype.cropImage = function(obj) {
     if(arguments.length != 1) {
         throw 'Please pass an "object" to bind with click event as Parameters in ImageFactory::cropImage';
     }
+    var that = this;
     obj.addEventListener('click', function(e) {
-        var imgWidth = self.cropView.width,
-        imgHeight = self.cropView.height,
-        imgLeft = self.cropView.animatedCenter.x - self.cropView.width / 2,
-        imgTop = self.cropView.animatedCenter.y - self.cropView.height / 2,
-        bgColor = self.cropView.borderColor;
+        var imgWidth = that.cropView.width,
+        imgHeight = that.cropView.height,
+        imgLeft = that.cropView.animatedCenter.x - that.cropView.width / 2,
+        imgTop = that.cropView.animatedCenter.y - that.cropView.height / 2,
+        bgColor = that.cropView.borderColor;
 
         // Ti.API.info("Crop : Image Prop " + imgWidth +"," + imgHeight + " Loc: (" + imgLeft + "," + imgTop + ")");
         // Save into Memory
-        self.cropView.borderColor = "transparent";
-        var blob = self.imageView.toImage(),
+        that.cropView.borderColor = "transparent";
+        var blob = that.imageView.toImage(),
         croped = blob.imageAsCropped({
             x : imgLeft,
             y : imgTop,
             height : imgHeight,
             width : imgWidth
         });
-        self.imageView.image = croped;
-        self.cropView.borderColor = bgColor;
+        that.imageView.image = croped;
+        that.cropView.borderColor = bgColor;
     });
 };
 
@@ -90,7 +90,7 @@ ImageFactory.prototype.setupCameraEvent = function(obj) {
     if(arguments.length != 1) {
         throw 'Please pass an "object" to bind with click event as Parameters in ImageFactory::setupCameraEvent';
     }
-
+    var that = this;
     obj.addEventListener('click', function(e) {
         var cameraOptions = {
             success : function(e) {
@@ -104,13 +104,13 @@ ImageFactory.prototype.setupCameraEvent = function(obj) {
                 // Ti.API.info("Crop : Image (" + cropRect.width +"," + cropRect.height + ")");
 
                 // set image on window
-                self.imageView.image = e.media;
+                that.imageView.image = e.media;
 
-                self.imgMaxWidth = e.media.width;
-                self.imgMaxHeight = e.media.height;
-                self.imageView.left = 0;
-                self.imageView.top = 0;
-                self.isZoom = false;
+                that.imgMaxWidth = e.media.width;
+                that.imgMaxHeight = e.media.height;
+                that.imageView.left = 0;
+                that.imageView.top = 0;
+                that.isZoom = false;
             },
             cancel : function() {
                 // cancel and close window
@@ -142,28 +142,30 @@ ImageFactory.prototype.setupCameraEvent = function(obj) {
 }
 
 ImageFactory.prototype.setupImageFactoryEvent = function() {
+    var that = this;
+
     //===== cropView =====//
 
     // Touch Start Event
-    self.cropView.addEventListener('touchstart', function(e) {
+    this.cropView.addEventListener('touchstart', function(e) {
         // Ti.API.info("==============================================");
         // Ti.API.info("Touch Start: X:" + e.x + " Y:" + e.y);
-        // Ti.API.info("Touch Start Animated Center: X:" + self.cropView.animatedCenter.x + " Y:" + self.cropView.animatedCenter.y);
+        // Ti.API.info("Touch Start Animated Center: X:" + that.cropView.animatedCenter.x + " Y:" + that.cropView.animatedCenter.y);
     });
 
     // Touch Move Event
-    self.cropView.addEventListener('touchmove', function(e) {
-        if(self.isPinch) {
+    this.cropView.addEventListener('touchmove', function(e) {
+        if(that.isPinch) {
             return;
         }
 
         // Crop Region Dimensions
-        var offSetX = self.imageView.width - self.cropView.width,
-        offSetY = self.imageView.height - self.cropView.height,
-        aMidX = self.cropView.animatedCenter.x,
-        aMidY = self.cropView.animatedCenter.y,
-        midX = self.cropView.width / 2,
-        midY = self.cropView.height / 2,
+        var offSetX = that.imageView.width - that.cropView.width,
+        offSetY = that.imageView.height - that.cropView.height,
+        aMidX = that.cropView.animatedCenter.x,
+        aMidY = that.cropView.animatedCenter.y,
+        midX = that.cropView.width / 2,
+        midY = that.cropView.height / 2,
         maxX = midX + offSetX,
         maxY = midY + offSetY,
         cropLeft = aMidX - midX,
@@ -189,91 +191,91 @@ ImageFactory.prototype.setupImageFactoryEvent = function() {
 
         // Check to see if this is zoomed
         // Ti.API.info("============================");
-        // Ti.API.info("Loc to: Image (" + self.imageView.left +"," + self.imageView.top + ")");
-        // Ti.API.info("Loc to: OffSet (" + self.defaultWidth +"," + self.defaultHeight + ")");
+        // Ti.API.info("Loc to: Image (" + that.imageView.left +"," + that.imageView.top + ")");
+        // Ti.API.info("Loc to: OffSet (" + that.defaultWidth +"," + that.defaultHeight + ")");
         // Ti.API.info("Loc to: Max (" + maxX +"," + maxY + ")");
         // Ti.API.info("Loc to: Crop (" + cropLeft +"," + cropTop + ")");
-        if(self.isZoom) {
-            var leftOffSet = cropLeft + self.imageView.left,
-            topOffSet = cropTop + self.imageView.top;
+        if(that.isZoom) {
+            var leftOffSet = cropLeft + that.imageView.left,
+            topOffSet = cropTop + that.imageView.top;
             // Ti.API.info("Left OffSet = " + leftOffSet + " Top OffSet = " + topOffSet);
-            if(leftOffSet < 0 && self.imageView.left !== 0) {
-                self.imageView.left -= leftOffSet;
+            if(leftOffSet < 0 && that.imageView.left !== 0) {
+                that.imageView.left -= leftOffSet;
             }
-            else if(leftOffSet > self.defaultWidth) {
-                self.imageView.left -= (leftOffSet - self.defaultWidth);
+            else if(leftOffSet > that.defaultWidth) {
+                that.imageView.left -= (leftOffSet - that.defaultWidth);
             }
-            if(topOffSet < 0 && self.imageView.top !== 0) {
-                self.imageView.top -= topOffSet;
+            if(topOffSet < 0 && that.imageView.top !== 0) {
+                that.imageView.top -= topOffSet;
             }
-            else if(topOffSet > self.defaultHeight) {
-                self.imageView.top -= (topOffSet - self.defaultHeight);
+            else if(topOffSet > that.defaultHeight) {
+                that.imageView.top -= (topOffSet - that.defaultHeight);
             }
         }
 
-        self.cropView.animate({
+        that.cropView.animate({
             center : {
                 x : movedX,
                 y : movedY
             },
             duration : 1
         }, function(e) {
-            // Ti.API.info("Image Capture Size: Image (" + self.imageView.left +"," + self.imageView.top + ")");
+            // Ti.API.info("Image Capture Size: Image (" + that.imageView.left +"," + that.imageView.top + ")");
         });
     });
 
     // Gestures Event (Image Resize)
     // pinch Event
-    self.imageView.addEventListener('pinch', function(e) {
-        self.isPinch = true;
-        self.isZoom = true;
+    this.imageView.addEventListener('pinch', function(e) {
+        that.isPinch = true;
+        that.isZoom = true;
 
-        var newWidth = self.imageView.width * e.scale,
-        newHeight = self.imageView.height * e.scale;
+        var newWidth = that.imageView.width * e.scale,
+        newHeight = that.imageView.height * e.scale;
 
         // Check to see the resolution more than expected
         // X Position
-        if (newWidth < self.imgMinWidth) {
-            newWidth = self.imgMinWidth;
+        if (newWidth < that.imgMinWidth) {
+            newWidth = that.imgMinWidth;
         }
-        else if (newWidth > self.imgMaxWidth) {
-            newWidth = self.imgMaxWidth;
+        else if (newWidth > that.imgMaxWidth) {
+            newWidth = that.imgMaxWidth;
         }
         // Y Position
-        if (newHeight < self.imgMinHeight) {
-            newHeight = self.imgMinHeight;
+        if (newHeight < that.imgMinHeight) {
+            newHeight = that.imgMinHeight;
         }
-        else if (newHeight > self.imgMaxHeight) {
-            newHeight = self.imgMaxHeight;
+        else if (newHeight > that.imgMaxHeight) {
+            newHeight = that.imgMaxHeight;
         }
 
-        if(newWidth === self.imgMinWidth || newHeight === self.imgMinHeight) {
-            self.isZoom = false
+        if(newWidth === that.imgMinWidth || newHeight === that.imgMinHeight) {
+            that.isZoom = false
         }
 
         // Set Center
-        // Ti.API.info("Set Center W: " + newWidth + " imgMinWidth: " + self.imgMinWidth);
-        // Ti.API.info("Set Center H: " + newHeight + " imgMinWidth: " + self.imgMinHeight);
-        self.imageView.left = (self.imgMinWidth - newWidth) / 2;
-        self.imageView.top = (self.imgMinHeight - newHeight) / 2;
+        // Ti.API.info("Set Center W: " + newWidth + " imgMinWidth: " + that.imgMinWidth);
+        // Ti.API.info("Set Center H: " + newHeight + " imgMinWidth: " + that.imgMinHeight);
+        that.imageView.left = (that.imgMinWidth - newWidth) / 2;
+        that.imageView.top = (that.imgMinHeight - newHeight) / 2;
 
         // Set the new Image Size
-        self.imageView.applyProperties({
+        that.imageView.applyProperties({
             width: Math.round(newWidth),
             height: Math.round(newHeight)
         });
 
-        self.cropView.animate({
+        that.cropView.animate({
             center : {
-                x : self.imageView.width / 2,
-                y : self.imageView.height / 2
+                x : that.imageView.width / 2,
+                y : that.imageView.height / 2
             },
             duration : 1
         }, function(e) {
-            self.isPinch = false;
+            that.isPinch = false;
         });
 
-        // Ti.API.info("Touch Start: X:" + self.imageView.width / 2 + " Y:" + self.imageView.height / 2);
+        // Ti.API.info("Touch Start: X:" + that.imageView.width / 2 + " Y:" + that.imageView.height / 2);
     });
 
 };
