@@ -59,7 +59,7 @@ ImageFactory.prototype.setImage = function(imgPath) {
 
 // Bind a click event to crop the image
 ImageFactory.prototype.cropImage = function(obj) {
-    if(arguments.length != 1) {
+    if(arguments.length !== 1) {
         throw 'Please pass an "object" to bind with click event as Parameters in ImageFactory::cropImage';
     }
     var that = this;
@@ -87,7 +87,7 @@ ImageFactory.prototype.cropImage = function(obj) {
 
 // Bind a click event to capture the camera
 ImageFactory.prototype.setupCameraEvent = function(obj) {
-    if(arguments.length != 1) {
+    if(arguments.length !== 1) {
         throw 'Please pass an "object" to bind with click event as Parameters in ImageFactory::setupCameraEvent';
     }
     var that = this;
@@ -250,7 +250,7 @@ ImageFactory.prototype.setupImageFactoryEvent = function() {
         }
 
         if(newWidth === that.imgMinWidth || newHeight === that.imgMinHeight) {
-            that.isZoom = false
+            that.isZoom = false;
         }
 
         // Set Center
