@@ -10,7 +10,8 @@ Image Manipulation Library for Appcelerator Titanium
 
 ### Alloy
 * In your view (*.xml), simply prepare the mark up as follow
-```xml
+
+```
 	<View id="image_wrapper">
 		<ImageView id="image">
 			<View id="crop_view"></View>
@@ -19,8 +20,10 @@ Image Manipulation Library for Appcelerator Titanium
     <Button id="photo_button"  ></Button>
 	<Button id="crop_button"  ></Button>
 ```
+
 * In your stylesheet (*.tss), adjust the width and height to match what you need
-```tss
+
+```
 	"#image_wrapper": {
 		top: 10,
 		width: '250',
@@ -48,8 +51,10 @@ Image Manipulation Library for Appcelerator Titanium
 		right: 5
 	}
 ```
+
 * In your controller (*.js), will call ImageFactory Library
-```js
+
+```
 	var ImageFactory = require('ImageFactory');
 	var imageFactoryObject = new ImageFactory($.image, $.crop_view);
 	imageFactoryObject.setDefaultImage('/images/burglar.png');
