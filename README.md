@@ -52,7 +52,7 @@ Image Manipulation Library for Appcelerator Titanium
 	}
 ```
 
-* In your controller (*.js), will call ImageFactory Library
+* In your controller (*.js), just call ImageFactory Library
 
 ```
 	var ImageFactory = require('ImageFactory');
@@ -61,6 +61,46 @@ Image Manipulation Library for Appcelerator Titanium
 	imageFactoryObject.setCropImageEvent($.crop_button);
 	imageFactoryObject.setCameraEvent($.photo_button);
 	imageFactoryObject.setImageFactoryEvents();
+```
+
+##Document
+
+```
+	/**
+	* Constructor
+	*
+	* @method ImageFactory
+	* @param {Object} ImageView
+	* @param {Object} View
+	* @return {Object} Returns ImageFactory
+	*/
+
+	/**
+	* Set the default image in ImageView
+	*
+	* @method setDefaultImage
+	* @param {String} path to your image
+	*/
+
+	/**
+	* Bind click event into an object parameter that will crop image
+	*
+	* @method setCropImageEvent
+	* @param {Object} object that will bind to click event
+	*/
+
+	/**
+	* Bind click event into an object parameter that will open camera or image gallery window
+	*
+	* @method setCameraEvent
+	* @param {Object} object that will bind to click event
+	*/
+
+	/**
+	* Bind all the necessary events to ImageView and View
+	*
+	* @method setImageFactoryEvents
+	*/
 ```
 
 ## Note:
