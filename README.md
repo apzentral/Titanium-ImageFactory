@@ -17,8 +17,8 @@ Image Manipulation Library for Appcelerator Titanium
 			<View id="crop_view"></View>
         </ImageView>
     </View>
-    <Button id="photo_button"  ></Button>
-	<Button id="crop_button"  ></Button>
+    <Button id="photo_button"></Button>
+	<Button id="crop_button"></Button>
 ```
 
 * In your stylesheet (*.tss), adjust the width and height to match what you need
