@@ -1,5 +1,5 @@
 /**
- * ImageFactory 0.0.1
+ * ImageFactory 0.0.2
  *
  * Library for Appcelerator Titanium
  *
@@ -17,6 +17,14 @@ function ImageFactory(imageView, cropView) {
     this.isPinch = false;
     this.isZoom = false;
 
+    // Convert Units
+    this.imageView.width = this.parseImgUnit(this.imageView.width);
+    this.imageView.height = this.parseImgUnit(this.imageView.height);
+
+    this.cropView.width = this.parseImgUnit(this.cropView.width);
+    this.cropView.height =this.parseImgUnit(this.cropView.height);
+
+    // Set The Properties
     this.defaultWidth = this.imageView.width - this.cropView.width;
     this.defaultHeight = this.imageView.height - this.cropView.height;
 
@@ -24,6 +32,8 @@ function ImageFactory(imageView, cropView) {
     this.imgMaxHeight = this.imageView.height;
     this.imgMinWidth = this.imageView.width;
     this.imgMinHeight = this.imageView.height;
+
+    // Set the Options
 }
 
 //===== Setter =====//
@@ -45,6 +55,54 @@ ImageFactory.prototype.setImgMinHeight = function (number) {
 }
 
 //===== Public Methods =====//
+
+// Code From :
+// http://developer.appcelerator.com/question/125317/calculate-apps-density-pixel-width--height-using-titaniumplatformdisplaycapsdpi
+ImageFactory.prototype.pixelsToDPUnits = function (thePixels) {
+    thePixels = parseInt(thePixels);
+    if ( Titanium.Platform.displayCaps.dpi > 160 ) {
+        return (thePixels / (Titanium.Platform.displayCaps.dpi / 160));
+    }
+    else {
+        return thePixels;
+    }
+}
+
+// Code From :
+// http://developer.appcelerator.com/question/125317/calculate-apps-density-pixel-width--height-using-titaniumplatformdisplaycapsdpi
+ImageFactory.prototype.dpUnitsToPixels = function (theDPUnits) {
+    theDPUnits = parseInt(theDPUnits);
+    // Ti.API.info("Before dip unit = " + theDPUnits);
+    if ( Titanium.Platform.displayCaps.dpi > 160 ) {
+        // Ti.API.info("After dip unit = " + (theDPUnits * (Titanium.Platform.displayCaps.dpi / 160)));
+        return (theDPUnits * (Titanium.Platform.displayCaps.dpi / 160));
+    }
+    else {
+        return theDPUnits;
+    }
+}
+
+
+// Note: There are
+// 1. px
+// 2. dip
+// 3. in
+// 4. mm
+// 5. cm
+// 6. pt
+// We need to remove convert into the correct pixel to perform math
+ImageFactory.prototype.parseImgUnit = function (value) {
+    // Ti.API.info(" Search = " + value.search('dip'));
+    // Ti.API.info("Value = " + value);
+    if(value.search('dip') !== -1) {
+        // Ti.API.info("converted dip unit = " + this.dpUnitsToPixels(value));
+        return parseInt(value);
+        // Need to convert to default unit
+        // return this.dpUnitsToPixels(value);
+    }
+
+    return value;
+}
 
 ImageFactory.prototype.setDefaultImage = function (imgPath) {
     if (arguments.length !== 1) {
@@ -172,13 +230,29 @@ ImageFactory.prototype.setCameraEvent = function (obj) {
 }
 
 ImageFactory.prototype.setImageFactoryEvents = function () {
-    var that = this;
+    var that = this,
+        baseWidth = 0,
+        baseHeight = 0,
+        oldBorder = this.cropView.borderColor;
 
     // Touch Start Event
     this.cropView.addEventListener('touchstart', function (e) {
+        // Ti.API.info("TouchStart");
         // Ti.API.info("==============================================");
         // Ti.API.info("Touch Start: X:" + e.x + " Y:" + e.y);
         // Ti.API.info("Touch Start Animated Center: X:" + that.cropView.animatedCenter.x + " Y:" + that.cropView.animatedCenter.y);
+
+        // Set initial width and height
+        baseWidth = that.imageView.width;
+        baseHeight = that.imageView.height;
+    });
+
+    // Touch End Event
+    this.cropView.addEventListener('touchend', function (e) {
+        if (that.isPinch) {
+            that.isPinch = false;
+            that.cropView.borderColor = oldBorder;
+        }
     });
 
     // Touch Move Event
@@ -186,6 +260,8 @@ ImageFactory.prototype.setImageFactoryEvents = function () {
         if (that.isPinch) {
             return;
         }
+
+        // Ti.API.info("Width: " + that.imageView.width + " Height: " + that.imageView.height);
 
         // Crop Region Dimensions
         var offSetX = that.imageView.width - that.cropView.width,
@@ -251,11 +327,20 @@ ImageFactory.prototype.setImageFactoryEvents = function () {
     // Gestures Event (Image Resize)
     // pinch Event
     this.imageView.addEventListener('pinch', function (e) {
+        // Ti.API.info("Pinch");
         that.isPinch = true;
         that.isZoom = true;
+        that.cropView.borderColor = "transparent";
 
-        var newWidth = that.imageView.width * e.scale,
-            newHeight = that.imageView.height * e.scale;
+        var newWidth = baseWidth * e.scale,
+            newHeight = baseHeight * e.scale;
+
+        // Ti.API.info("Pinch: oldBorder = " + oldBorder);
+
+        // Ti.API.info("===========================");
+        // Ti.API.info(e);
+        // Ti.API.info("e.scale = " + e.scale);
+        // Ti.API.info("New = (" + newWidth + "," + newHeight + ")");
 
         // Check to see the resolution more than expected
         // X Position
@@ -294,7 +379,7 @@ ImageFactory.prototype.setImageFactoryEvents = function () {
             },
             duration: 1
         }, function (e) {
-            that.isPinch = false;
+            // Ti.API.info("oldBorder = " + oldBorder);
         });
 
         // Ti.API.info("Touch Start: X:" + that.imageView.width / 2 + " Y:" + that.imageView.height / 2);

@@ -109,5 +109,8 @@ Image Manipulation Library for Appcelerator Titanium
 
 ## Version
 
+### 0.0.2
+* Reduce Sensitivity when Zoom
+
 ### 0.0.1
 * Beta Release
